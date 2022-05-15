@@ -45,6 +45,36 @@ def score_game(random_predict) -> int:
     return score
 
 
+def not_actually_random_predict(number: int=1) -> int:
+    """Ищем число в интервале от 1 до 100 отсекая половину исследуемого диапазона на каждой итерации
+
+    Args:
+        number (int, optional): Загаданное число. Defaults to 1.
+        
+    Returns:
+        int: Число попыток
+    """
+    count = 0
+    max_number = 100
+    min_number = 1
+    while True:
+        count+=1
+        predict_number= int(np.mean([max_number, min_number])) #Вычисляем число как среднеарифметическое от максимума и минимума
+        if predict_number == number: 
+            break
+        elif predict_number > number: #Если загаданное число меньше половины  исследуемого диапазона
+            max_number -= predict_number #Отсекаем верхнюю границу
+        elif predict_number < number: #Если загаданное число больше половины исследуемого диапазона
+            min_number += predict_number
+            
+            
+            
+    return count
+            
+            
+        
+
+        
 if __name__ == "__main__":
     # RUN
     score_game(random_predict)
