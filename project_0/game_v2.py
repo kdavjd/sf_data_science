@@ -44,37 +44,63 @@ def score_game(random_predict) -> int:
     print(f"Ваш алгоритм угадывает число в среднем за:{score} попыток")
     return score
 
-
-def not_actually_random_predict(number: int=1) -> int:
-    """Ищем число в интервале от 1 до 100 отсекая половину исследуемого диапазона на каждой итерации
+def predict_by_divide(number: int =1, min_number: int=1, max_number: int=100) -> int:
+    """Функция делит исследуемую область на равные интервалы в две единицы, отбрасывая 
+    хвосты. 
 
     Args:
         number (int, optional): Загаданное число. Defaults to 1.
-        
-    Returns:
-        int: Число попыток
-    """
-    count = 0
-    max_number = 100
-    min_number = 1
-    while True:
-        count+=1
-        predict_number= int(np.mean([max_number, min_number])) #Вычисляем число как среднеарифметическое от максимума и минимума
-        if predict_number == number: 
-            break
-        elif predict_number > number: #Если загаданное число меньше половины  исследуемого диапазона
-            max_number -= predict_number #Отсекаем верхнюю границу
-        elif predict_number < number: #Если загаданное число больше половины исследуемого диапазона
-            min_number += predict_number
-            
-            
-            
-    return count
-            
-            
-        
+        min_number (int, optional): Нижняя граница числа. Defaults to 1.
+        max_number (int, optional): Верхняя граница числа. Defaults to 100.
 
+    Returns:
+        int: Число попыток.
+    """
+    count=0
+    
+    divide_list = [border for border in range(min_number,max_number) if \
+        border%2 == 0]
+    
+    if min(divide_list) < number < max(divide_list): #Начало и конец строго отбрасываются.
+        for border in divide_list:
+            if border > number: #Поскольку шаг два, то число либо предыдущее, либо то что за ним.
+                if number == border-2:
+                    count += 1
+                    break                                   
+                elif number == border-1:
+                        count+=1
+                        break
+                else:
+                    raise Exception('Поздравляю, что-то не так.')
+            
+            
+    elif max_number >= number >= max(divide_list): #Ищем число в верхнем хвосте
+        if number == max(divide_list)+2:
+            count += 1           
+        elif number == max(divide_list)+1:
+            count += 1
+        elif number == max(divide_list):
+            count += 1       
+        else:
+            raise Exception('Ошибка в верхних граничных исключениях')
+    
+    elif min_number <= number <= min(divide_list): #Ищем число в нижнем хвосте
+        if number == min(divide_list)-2:
+            count += 1                
+        elif number == min(divide_list)-1:
+            count += 1
+        elif number == min(divide_list):
+            count += 1
+        else:
+            raise Exception('Ошибка в нижних граничных исключениях')
+        
+    
+    return count
+ 
         
 if __name__ == "__main__":
     # RUN
     score_game(random_predict)
+    score_game(predict_by_divide)
+    
+    
