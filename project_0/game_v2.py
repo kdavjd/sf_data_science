@@ -48,13 +48,13 @@ def score_game(random_predict) -> int:
 
 def predict_by_divide(number: int =1, min_number: int=1, max_number: int=100, count: int=0) -> int:
     """Функция делит исследуемую область на равные интервалы в две единицы, отбрасывая 
-    хвосты. 
+    хвосты. Это не самая красивая или эффективная функция, но первая рабочая, написанная мной. 
 
     Args:
         number (int, optional): Загаданное число. Defaults to 1.
         min_number (int, optional): Нижняя граница числа. Defaults to 1.
         max_number (int, optional): Верхняя граница числа. Defaults to 100.
-        count (int, optional): Верхняя граница числа. Defaults to 0.
+        count (int, optional): Число попыток. Defaults to 0.
 
     Returns:
         int: Число попыток.
@@ -79,6 +79,7 @@ def predict_by_divide(number: int =1, min_number: int=1, max_number: int=100, co
             
             
     elif max_number >= number >= max(divide_list): #Ищем число в верхнем хвосте
+        count += 1 #+1 потому что до этого места мы искали в главном интервале
         if number == max(divide_list):
             count += 1           
         elif number == max(divide_list)+1:
@@ -89,6 +90,7 @@ def predict_by_divide(number: int =1, min_number: int=1, max_number: int=100, co
             raise Exception('Ошибка в верхних граничных исключениях')
     
     elif min_number <= number <= min(divide_list): #Ищем число в нижнем хвосте
+        count += 2 #+2 потому что до этого места мы искали в главном интервале и в конце
         if number == min(divide_list):
             count += 1                
         elif number == min(divide_list)-1:
@@ -121,10 +123,11 @@ def predict_by_recursion(number, min_number: int=1, max_number: int=100) -> pred
     def max_border_near(number: int):  
         nonlocal count
         nonlocal max_number
-        if number < int(np.average([min_number,max_number])):
-            if max_number - int(np.average([min_number,max_number])) < min_number:
+        average = int(np.average([min_number,max_number]))
+        if number < average:
+            if max_number - average < min_number:
                 return max_number
-            max_number -= int(np.average([min_number,max_number]))
+            max_number -= average
             count += 1
             return max_border_near(number)
         return max_number
@@ -147,13 +150,13 @@ def predict_by_recursion(number, min_number: int=1, max_number: int=100) -> pred
             return min_border_near(number)
         
         return min_number
+       
     
-    if number == min_number: #Исключение, которое не нашел как элегантно обойти.
-        count += 1
-        return count
-    
-    elif number < int(np.average([min_number,max_number])): #Мне показалось что есть зависимость между началом отсечений.
-        count += 1
+    if number < int(np.average([min_number,max_number])):
+        if number == min_number: #Исключение, которое не нашел как элегантно обойти.
+            count += 1
+            return count
+        count += 1 #+1 потому что до этого места мы сравнивали с минимумом
         max_border_near(number)
         min_border_near(number)
     else:
